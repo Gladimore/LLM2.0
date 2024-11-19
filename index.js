@@ -1,5 +1,5 @@
 const TogetherClient = require("./client");
-const { GetFile } = require("api/utils");
+const { GetFile } = require("./api/utils"); // Use relative path
 
 const express = require("express");
 const app = express();
