@@ -16,7 +16,10 @@ app.use((_, res, next) => {
 
 const max_tokens = 1024;
 const ai = new TogetherClient();
-const models = ["meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"];
+const models = [
+  "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+  "meta-llama/Llama-Vision-Free"
+];
 
 const password = process.env["PASSWORD"];
 
@@ -28,7 +31,11 @@ app.post("/api/chat", async (req, res) => {
   }
 
   if (!models.includes(model)) {
-    return res.status(400).json({ error: "Model not found" });
+    return res
+      .status(400)
+      .json({
+        error: `Model not found (${model}), available models: ${models.join(" | ")}`,
+      });
   }
 
   if (!chatMessages || chatMessages.length === 0) {
