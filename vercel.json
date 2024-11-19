@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "routes": [{
-      "src": "/(.*)",
-      "dest": "index.js"
-  }],
   "functions": {
-    "api/utils.js": {
+    "index.js": {
       "includeFiles": "models.json"
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.js"
+    }
+  ]
 }
