@@ -1,5 +1,5 @@
 const TogetherClient = require("./client");
-const { GetFile } = require("./utils");
+const { GetFile } = require("api/utils");
 
 const express = require("express");
 const app = express();
