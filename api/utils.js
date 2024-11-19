@@ -3,8 +3,7 @@ const path = require("path");
 
 function GetFile(filePath) {
   const fullPath = path.join(process.cwd(), filePath);
-  let file = fs.readFileSync(fullPath, "utf-8");
-  return new Response(file);
+  return fs.readFileSync(fullPath, "utf-8"); // Return the file as a string
 }
 
 module.exports = { GetFile };
