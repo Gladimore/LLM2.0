@@ -1,6 +1,6 @@
 {
   "functions": {
-    "utils.js": {
+    "api/utils.js": {
       "includeFiles": "models.json"
     }
   }
