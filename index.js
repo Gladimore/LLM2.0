@@ -18,7 +18,8 @@ const max_tokens = 1024;
 const ai = new TogetherClient();
 const models = [
   "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-  "meta-llama/Llama-Vision-Free"
+  "meta-llama/Llama-Vision-Free",
+  "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
 ];
 
 const password = process.env["PASSWORD"];
