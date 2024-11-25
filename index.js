@@ -1,8 +1,11 @@
+const fs = require("fs");
+const path = require("path");
 const TogetherClient = require("./client.js");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
-const app = express();
+require("dotenv").config();
 
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -15,28 +18,24 @@ app.use((_, res, next) => {
 });
 
 const max_tokens = 1024;
-const ai = new TogetherClient();
-const modelConfig = [
-  {
-    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-    "rateLimit": 100
-  },
-  {
-    "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-    "rateLimit": 50
-  },
-  {
-    "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
-    "rateLimit": 20
-  }
-]
 const PASSWORD = process.env["PASSWORD"];
+const ai = new TogetherClient();
+
+// Read modelConfig from file
+const modelConfigPath = path.join(process.cwd(), "modelConfig.json");
+let modelConfig = [];
+try {
+  const fileContent = fs.readFileSync(modelConfigPath, "utf-8");
+  modelConfig = JSON.parse(fileContent);
+} catch (error) {
+  console.error("Failed to read modelConfig.json:", error);
+}
 
 // Rate limiters for each model
 const rateLimiters = modelConfig.reduce((acc, config) => {
   acc[config.model] = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: config.rateLimit, // Rate limit from the model configuration
+    max: config.rateLimit,
     message: {
       error: `Rate limit exceeded for model ${config.model}. Please wait before making more requests.`,
     },
@@ -46,20 +45,19 @@ const rateLimiters = modelConfig.reduce((acc, config) => {
   return acc;
 }, {});
 
+// Get available models
 app.get("/api/models", (_, res) => {
   res.json(modelConfig);
 });
 
-// Main chat processing route with dynamic rate limiter
+// Chat endpoint
 app.post(
   "/api/chat",
   (req, res, next) => {
-    console.log(req.body);
     const { model, key } = req.body;
 
     // Validate key (password)
     if (key !== PASSWORD) {
-      console.log(key, PASSWORD);
       return res.status(400).json({ error: "Invalid password" });
     }
 
@@ -73,7 +71,7 @@ app.post(
     // Attach rate limiter for the specified model
     const rateLimiter = rateLimiters[model];
     if (rateLimiter) {
-      rateLimiter(req, res, next); // Call the rate limiter middleware
+      rateLimiter(req, res, next);
     } else {
       res.status(500).json({ error: "Unexpected error with rate limiter." });
     }
@@ -87,14 +85,13 @@ app.post(
     }
 
     try {
-      // Process the chat request using TogetherClient
       const response = await ai.chat(model, chatMessages, max_tokens);
       res.json(response);
     } catch (error) {
       console.error("Error during chat processing:", error);
       res.status(500).json({ error: "Failed to process the request" });
     }
-  },
+  }
 );
 
 const PORT = process.env.PORT || 3000;
