@@ -22,10 +22,14 @@ const modelConfig = [
     "rateLimit": 100
   },
   {
+    "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+    "rateLimit": 50
+  },
+  {
     "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
     "rateLimit": 20
   }
-];
+]
 const PASSWORD = process.env["PASSWORD"];
 
 // Rate limiters for each model
@@ -42,46 +46,56 @@ const rateLimiters = modelConfig.reduce((acc, config) => {
   return acc;
 }, {});
 
-// Main chat processing route with dynamic rate limiter
-app.post("/api/chat", (req, res, next) => {
-  const { model, key } = req.body;
-
-  // Validate key (password)
-  if (key !== PASSWORD) {
-    return res.status(400).json({ error: "Invalid password" });
-  }
-
-  // Validate model
-  if (!modelConfig.some((config) => config.model === model)) {
-    return res.status(400).json({
-      error: `Model not found (${model}), available models: ${modelConfig.map((m) => m.model).join(" | ")}`,
-    });
-  }
-
-  // Attach rate limiter for the specified model
-  const rateLimiter = rateLimiters[model];
-  if (rateLimiter) {
-    rateLimiter(req, res, next); // Call the rate limiter middleware
-  } else {
-    res.status(500).json({ error: "Unexpected error with rate limiter." });
-  }
-}, async (req, res) => {
-  const { chatMessages, model } = req.body;
-
-  // Validate chat messages
-  if (!chatMessages || chatMessages.length === 0) {
-    return res.status(400).json({ error: "Chat messages are required" });
-  }
-
-  try {
-    // Process the chat request using TogetherClient
-    const response = await ai.chat(model, chatMessages, max_tokens);
-    res.json(response);
-  } catch (error) {
-    console.error("Error during chat processing:", error);
-    res.status(500).json({ error: "Failed to process the request" });
-  }
+app.get("/api/models", (_, res) => {
+  res.json(modelConfig);
 });
+
+// Main chat processing route with dynamic rate limiter
+app.post(
+  "/api/chat",
+  (req, res, next) => {
+    console.log(req.body);
+    const { model, key } = req.body;
+
+    // Validate key (password)
+    if (key !== PASSWORD) {
+      console.log(key, PASSWORD);
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    // Validate model
+    if (!modelConfig.some((config) => config.model === model)) {
+      return res.status(400).json({
+        error: `Model not found (${model}), available models: ${modelConfig.map((m) => m.model).join(" | ")}`,
+      });
+    }
+
+    // Attach rate limiter for the specified model
+    const rateLimiter = rateLimiters[model];
+    if (rateLimiter) {
+      rateLimiter(req, res, next); // Call the rate limiter middleware
+    } else {
+      res.status(500).json({ error: "Unexpected error with rate limiter." });
+    }
+  },
+  async (req, res) => {
+    const { chatMessages, model } = req.body;
+
+    // Validate chat messages
+    if (!chatMessages || chatMessages.length === 0) {
+      return res.status(400).json({ error: "Chat messages are required" });
+    }
+
+    try {
+      // Process the chat request using TogetherClient
+      const response = await ai.chat(model, chatMessages, max_tokens);
+      res.json(response);
+    } catch (error) {
+      console.error("Error during chat processing:", error);
+      res.status(500).json({ error: "Failed to process the request" });
+    }
+  },
+);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
