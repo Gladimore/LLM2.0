@@ -47,7 +47,7 @@ const rateLimiters = modelConfig.reduce((acc, config) => {
 }, {});
 
 router.post(
-  "/api/chat",
+  "/chat",
   (req, res, next) => {
     const { model, key } = req.body;
 
