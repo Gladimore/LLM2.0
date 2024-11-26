@@ -7,21 +7,11 @@ import rateLimit from "express-rate-limit";
 const router = express.Router();
 
 const filePath = path.join(process.cwd(), "models.json");
-let modelConfig = [];
+const modelConfig = JSON.parse(fs.readFile(filePath, "utf8"));
 
 const max_tokens = 1024;
 const PASSWORD = process.env.PASSWORD;
 const ai = new TogetherClient();
-
-async function loadModelConfig() {
-  try {
-    const file = await fs.readFile(filePath, "utf8");
-    modelConfig = JSON.parse(file);
-  } catch (error) {
-    console.error("Error loading model configuration:", error);
-    throw new Error("Failed to load model configuration");
-  }
-}
 
 router.get("/api/models", async (_, res) => {
   try {
@@ -89,12 +79,6 @@ router.post(
 router.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: err.message });
-});
-
-// Load model configuration on startup
-loadModelConfig().catch((error) => {
-  console.error("Failed to load model configuration:", error);
-  process.exit(1);
 });
 
 export default (req, res) => {
