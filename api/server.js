@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs/promises";
 import path from "path";
-import TogetherClient from "../client.js";
+import TogetherClient from "./client.js";
 import rateLimit from "express-rate-limit";
 
 const router = express.Router();
