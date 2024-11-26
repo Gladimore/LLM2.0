@@ -25,6 +25,7 @@ async function loadModelConfig() {
 
 router.get("/api/models", async (_, res) => {
   try {
+    await loadModelConfig();
     res.setHeader("Content-Type", "application/json");
     res.json(modelConfig);
   } catch (error) {
