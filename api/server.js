@@ -23,7 +23,7 @@ async function loadModelConfig() {
   }
 }
 
-router.get("/", async (_, res) => {
+router.get("/api/models", async (_, res) => {
   try {
     res.setHeader("Content-Type", "application/json");
     res.json(modelConfig);
@@ -47,7 +47,7 @@ const rateLimiters = modelConfig.reduce((acc, config) => {
 }, {});
 
 router.post(
-  "/chat",
+  "/api/chat",
   (req, res, next) => {
     const { model, key } = req.body;
 
