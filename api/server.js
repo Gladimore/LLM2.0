@@ -97,4 +97,10 @@ loadModelConfig().catch((error) => {
   process.exit(1);
 });
 
-export default router;
+export default (req, res) => {
+  router(req, res, (err) => {
+    if (err) {
+      res.status(err.status || 500).json({ error: err.message });
+    }
+  });
+};
