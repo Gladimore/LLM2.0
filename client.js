@@ -6,6 +6,7 @@ class TogetherClient {
     this.together = new Together({
       apiKey: this.apiKey,
     });
+    this.default_tokens = 1024;
   }
 
   async chat(model, messages, { max_tokens, ...rest } = {}) {
@@ -17,7 +18,7 @@ class TogetherClient {
       model: model,
       messages: messages,
       stream: false,
-      max_tokens: max_tokens || 2048,
+      max_tokens: max_tokens == undefined? max_tokens: this.default_tokens;,
       ...rest,
     });
 
