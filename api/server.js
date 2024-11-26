@@ -70,6 +70,7 @@ router.post(
     }
   },
   async (req, res) => {
+    console.log("called")
     const { chatMessages, model } = req.body;
 
     if (!chatMessages || chatMessages.length === 0) {
