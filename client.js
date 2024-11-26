@@ -18,7 +18,7 @@ class TogetherClient {
       model: model,
       messages: messages,
       stream: false,
-      max_tokens: max_tokens == undefined? max_tokens: this.default_tokens;,
+      max_tokens: max_tokens == undefined? max_tokens: this.default_tokens,
       ...rest,
     });
 
