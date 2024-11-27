@@ -18,6 +18,7 @@ class TogetherClient {
       model: model,
       messages: messages,
       stream: false,
+      max_tokens: max_tokens || this.default_tokens,
       ...rest,
     });
 
