@@ -25,6 +25,10 @@ const ai = new TogetherClient();
 
 const modelConfig = [
   {
+    "model": "meta-llama/Llama-Vision-Free",
+    "rateLimit": 300
+  },
+  {
     "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
     "rateLimit": 100
   },
