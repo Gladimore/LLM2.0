@@ -19,7 +19,7 @@ app.use((_, res, next) => {
   next();
 });
 
-const max_tokens = 1024
+const max_tokens = 4096;
 const PASSWORD = process.env.PASSWORD;
 const ai = new TogetherClient();
 
