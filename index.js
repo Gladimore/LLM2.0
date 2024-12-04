@@ -1,6 +1,7 @@
 import Together from "together-ai";
 import express from "express";
 import rateLimit from "express-rate-limit";
+import cors from "cors";
 
 // Environment variables
 const TOGETHER_API_KEY = process.env["TOGETHER_API_KEY"];
@@ -15,6 +16,7 @@ const app = express();
 // Middleware
 //app.use(express.static("public"));
 app.use(express.json());
+app.use(cors());
 
 // Model configurations
 const modelConfig = [
