@@ -144,7 +144,7 @@ app.post("/api/chat", authLimiter, async (req, res) => {
         }
       } else {
         const stream = await together.chat.completions.create(REQUEST);
-        res.json(stream.choices[0].message.content);
+        res.json(await stream.choices[0].message.content);
       }
     });
   } else {
