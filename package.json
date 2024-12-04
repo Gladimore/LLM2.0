@@ -9,13 +9,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "type": "module",
+  "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
-    "modules": "^0.4.0",
-    "together-ai": "^0.6.0-alpha.4"
+    "together-ai": "^0.10.0"
   }
 }
