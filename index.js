@@ -1,7 +1,7 @@
 import Together from "together-ai";
 import express from "express";
 import rateLimit from "express-rate-limit";
-import cors from "cors";
+import cors from "cors"
 
 // Environment variables
 const TOGETHER_API_KEY = process.env["TOGETHER_API_KEY"];
@@ -101,8 +101,6 @@ app.post("/api/chat", authLimiter, async (req, res) => {
   const { REQUEST, PASSWORD } = req.body;
   const { model } = REQUEST;
 
-  REQUEST.stream = true;
-
   if (PASSWORD !== API_PASSWORD) {
     res.status(401).send("Unauthorized");
     return;
@@ -122,26 +120,31 @@ app.post("/api/chat", authLimiter, async (req, res) => {
   const rateLimiter = rateLimiters[model];
   if (rateLimiter) {
     rateLimiter(req, res, async () => {
-      try {
-        const stream = await together.chat.completions.create(REQUEST);
+      if (REQUEST.stream) {
+        try {
+          const stream = await together.chat.completions.create(REQUEST);
 
-        res.setHeader("Content-Type", "application/json");
-        res.setHeader("Transfer-Encoding", "chunked");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Transfer-Encoding", "chunked");
+          res.setHeader("Cache-Control", "no-cache");
+          res.setHeader("Connection", "keep-alive");
 
-        for await (const chunk of stream) {
-          const content = chunk.choices[0]?.delta?.content || "";
-          if (content) {
-            res.write(JSON.stringify({ content }) + "\n");
+          for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || "";
+            if (content) {
+              res.write(JSON.stringify({ content }) + "\n");
+            }
           }
-        }
 
-        res.end();
-      } catch (error) {
-        console.error("Error streaming:", error);
-        res.write(JSON.stringify({ error: error.message }) + "\n");
-        res.end();
+          res.end();
+        } catch (error) {
+          console.error("Error streaming:", error);
+          res.write(JSON.stringify({ error: error.message }) + "\n");
+          res.end();
+        }
+      } else {
+        const stream = await together.chat.completions.create(REQUEST);
+        res.json(stream.choices[0].message.content);
       }
     });
   } else {
