@@ -1,7 +1,7 @@
 import Together from "together-ai";
 import express from "express";
 import rateLimit from "express-rate-limit";
-import cors from "cors"
+import cors from "cors";
 
 // Environment variables
 const TOGETHER_API_KEY = process.env["TOGETHER_API_KEY"];
@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use((_, res, next) => {
-  res.setTimeout(0); // Disable timeout for streaming requests
+  res.setTimeout(300000); // 5 minutes instead of 0
   next();
 });
 
@@ -55,7 +55,8 @@ const rateLimiters = modelConfig.reduce((acc, config) => {
 // Authentication rate limiter
 const authLimiter = async (req, res, next) => {
   const ip = req.ip;
-  const authCounts = authLimiter.authCounts || (authLimiter.authCounts = new Map());
+  const authCounts =
+    authLimiter.authCounts || (authLimiter.authCounts = new Map());
   const now = Date.now();
   const max = 5; // Allow 5 incorrect attempts within 5 minutes
   const windowMs = 5 * 60 * 1000;
@@ -73,7 +74,11 @@ const authLimiter = async (req, res, next) => {
   if (count.requests >= max) {
     const retryAfter = Math.ceil((count.timestamp + windowMs - now) / 1000);
     res.set("Retry-After", retryAfter);
-    res.status(429).json({ error: "Too many incorrect password attempts. Please try again later." });
+    res
+      .status(429)
+      .json({
+        error: "Too many incorrect password attempts. Please try again later.",
+      });
     return;
   }
 
@@ -110,7 +115,7 @@ app.post("/api/chat", authLimiter, async (req, res) => {
     return;
   }
 
-  console.log(REQUEST, PASSWORD)
+  console.log(REQUEST);
 
   // If password is correct, reset the rate limiter
   authLimiter.reset(req.ip);
@@ -125,6 +130,10 @@ app.post("/api/chat", authLimiter, async (req, res) => {
   if (rateLimiter) {
     rateLimiter(req, res, async () => {
       if (REQUEST.stream) {
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
         try {
           const stream = await together.chat.completions.create(REQUEST);
 
