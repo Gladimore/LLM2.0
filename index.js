@@ -33,6 +33,10 @@ const modelConfig = [
     rateLimit: 50,
   },
   {
+    model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+    rateLimit: 50,
+  },
+  {
     model: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
     rateLimit: 10,
   },
