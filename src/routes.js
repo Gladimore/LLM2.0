@@ -12,11 +12,14 @@ function getFileHandler() {
     return models;
   }
 
-  const completePath = path.join(__dirname, "../data/models.json");
+  const completePath = path.join(__dirname, "/data/models.json");
+  console.log(completePath);
   const res = fs.readFileSync(completePath, "utf-8");
-  models = res;
+  const json = JSON.parse(res);
+  
+  models = json;
 
-  return res;
+  return json;
 }
 
 import AIHandler from "../js/aiHandler.js";
