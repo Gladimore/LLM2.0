@@ -1,13 +1,29 @@
 import { Router } from "express";
 import expressRateLimiter from "express-rate-limit";
+import fs from "fs";
+import path from "path";
 
-import getFileHandler from "../js/getFile.js";
+let models = [];
+
+const __dirname = process.cwd();
+
+function getFileHandler() {
+  if (models) {
+    return models;
+  }
+
+  const completePath = path.join(__dirname, "../data/models.json");
+  const res = fs.readFileSync(completePath, "utf-8");
+  models = res;
+
+  return res;
+}
+
 import AIHandler from "../js/aiHandler.js";
 
 const router = Router();
 const ai = new AIHandler();
 
-const modelPath = "../data/models.json";
 const API_PASSWORD = process.env["API_PASSWORD"];
 
 const rateLimiter = expressRateLimiter({
@@ -18,7 +34,7 @@ const rateLimiter = expressRateLimiter({
 });
 
 router.get("/models", (_, res) => {
-  const models = getFileHandler(modelPath);
+  const models = getFileHandler();
 
   return res.json(models);
 });
@@ -30,7 +46,7 @@ router.post("/chat", rateLimiter, (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const models = getFileHandler(modelPath);
+  const models = getFileHandler();
 
   if (!models.includes(request_body.model)) {
     return res.status(400).json({ error: "Invalid model" });
