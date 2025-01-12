@@ -3,7 +3,7 @@ import expressRateLimiter from "express-rate-limit";
 import fs from "fs";
 import path from "path";
 
-let models = [];
+let models = null;
 
 const __dirname = process.cwd();
 
