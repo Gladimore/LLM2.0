@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 const API_KEY = process.env["API_KEY"];
-const url = "https://api.groq.com/openai/v1/models";
+const url = "https://api.sambanova.ai/v1/chat/completions";
 
 class AIHandler {
   static async processResponse(response) {
@@ -16,7 +16,7 @@ class AIHandler {
     };
   }
 
-  async send(request_body) {
+  async send() {
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -24,7 +24,7 @@ class AIHandler {
           Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(request_body),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
