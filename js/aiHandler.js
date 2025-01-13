@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 const API_KEY = process.env["API_KEY"];
-const url = "https://api.sambanova.ai/v1/chat/completions";
+const url = "https://api.groq.com/openai/v1/models";
 
 class AIHandler {
   static async processResponse(response) {
