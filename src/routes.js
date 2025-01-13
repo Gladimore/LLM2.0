@@ -6,8 +6,9 @@ import path from "path";
 let models = null;
 
 const __dirname = process.cwd();
+const API_KEY + process.env["API_KEY"];
 
-function getFileHandler() {
+/*function getFileHandler() {
   if (models) {
     return models;
   }
@@ -20,6 +21,30 @@ function getFileHandler() {
   models = json;
 
   return json;
+}*/
+
+async function getFileHandler() {
+  if (models) {
+    return models
+  }
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/models", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`,
+      },
+    })
+
+    const { data } = await res.json()
+    let finsihed = data.map(t => t.id)
+    
+    models = finsihed;
+    return finsihed;
+  } catch (error) {
+    console.error("Error fetching models:", error)
+  }
 }
 
 import AIHandler from "../js/aiHandler.js";
