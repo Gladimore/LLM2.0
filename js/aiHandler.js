@@ -16,7 +16,7 @@ class AIHandler {
     };
   }
 
-  async send() {
+  async send(request_body) {
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -24,7 +24,7 @@ class AIHandler {
           Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(request_body),
       });
 
       if (!response.ok) {
