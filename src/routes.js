@@ -16,7 +16,7 @@ function getFileHandler() {
   console.log(completePath);
   const res = fs.readFileSync(completePath, "utf-8");
   const json = JSON.parse(res);
-  
+
   models = json;
 
   return json;
@@ -42,7 +42,7 @@ router.get("/models", (_, res) => {
   return res.json(models);
 });
 
-router.post("/chat", rateLimiter, (req, res) => {
+router.post("/chat", rateLimiter, async (req, res) => {
   const { request_body, password } = req.body;
 
   if (password !== API_PASSWORD) {
@@ -55,13 +55,17 @@ router.post("/chat", rateLimiter, (req, res) => {
     return res.status(400).json({ error: "Invalid model" });
   }
 
-  const { message, json, errored, err_message } = ai.send(request_body);
+  const { message, json, errored, err_message } = await ai.send(request_body);
 
   if (errored) {
     return res.status(500).json({ error: err_message });
   }
 
   return res.json({ message, json });
+});
+
+router.get("*", (_, res) => {
+  res.sendStatus(404);
 });
 
 export default router;
