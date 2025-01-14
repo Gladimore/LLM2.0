@@ -4,19 +4,7 @@ const API_KEY = process.env["API_KEY"];
 const url = "https://api.sambanova.ai/v1/chat/completions";
 
 class AIHandler {
-  static async processResponse(response) {
-    const json = await response.json();
-    const { choices } = json;
-
-    const message = choices[0].message.content;
-
-    return {
-      message,
-      json,
-    };
-  }
-
-  async send() {
+  async send(data) {
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -31,7 +19,15 @@ class AIHandler {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      return await this.processResponse(response);
+      const json = await response.json();
+      const { choices } = json;
+
+      const message = choices[0].message.content;
+
+      return {
+        message,
+        json,
+      };
     } catch (error) {
       console.error("Error:", error);
       return {
